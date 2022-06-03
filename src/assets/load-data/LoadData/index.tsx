@@ -7,10 +7,12 @@ import useLoadUserData from "../LoadAccountData";
 import Web3 from "web3";
 import {useWeb3React} from "@web3-react/core";
 import {Web3Provider} from "@ethersproject/providers";
-
+import {useDispatch} from "react-redux";
+import {setWalletData} from "../../../store/accountWallet";
 const {ethereum} = window as any
 const LoadData = ({children}: any) => {
   const {user, loading} = useLoadUserData();
+  const dispatch = useDispatch()
   const {
     connector,
     account,
@@ -61,7 +63,7 @@ const LoadData = ({children}: any) => {
     if (accounts.length === 0) {
       console.log("Please connect to metamask");
     }
-    console.log("changAccount")
+    dispatch(setWalletData({address:accounts[0]}))
   };
   const connected = injected === connector;
   useEffect(() => {

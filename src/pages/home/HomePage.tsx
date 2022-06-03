@@ -135,12 +135,9 @@ const HomePage: React.FunctionComponent = () => {
 
   return (
     <div>
-      <Modal title="SEND_REQUEST" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-        <Row className={"d-flex justify-content-center align-items-center h-100"}>
-          <Col xl={8} xs={18}>
+      <Modal footer={null} title="SEND_REQUEST" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
             <form className="mt-2" onSubmit={handleSubmit}>
-              <div
-                className="p-4 credit-card w-full lg:w-1/2 sm:w-auto shadow-lg mx-auto rounded-xl bg-white">
+              <div>
                 <main className="mt-4">
                   <h4 className="text-xl font-semibold text-gray-700 text-center">
                     SEND BSB PAYMENT
@@ -180,8 +177,6 @@ const HomePage: React.FunctionComponent = () => {
                 </footer>
               </div>
             </form>
-          </Col>
-        </Row>
       </Modal>
       <div>
         <img
@@ -199,6 +194,10 @@ const HomePage: React.FunctionComponent = () => {
                 style={{color: "rgb(147,147,147)", fontWeight: "600"}}>{myAccount.address} </span></div>
               <div className={"py-1"}>Balance: {balance ? balance : "0.0"} BNB</div>
               <div className={"py-1"}>Token: BEP-20 Token Txns</div>
+              <div className={"d-flex py-1"}>
+                <Button type={"primary"} className={"mx-1"} onClick={()=>{setIsModalVisible(true)}}>TRANSFER ETH</Button>
+                <Button type={"primary"} className={"mx-1"}>GET ETH</Button>
+              </div>
             </Card>
           </Col>
 
@@ -209,18 +208,23 @@ const HomePage: React.FunctionComponent = () => {
                 style={{color: "rgb(147,147,147)", fontWeight: "600"}}>{myAccount.address} </span></div>
               <div className={"py-1"}>Balance: {balance ? balance : "0.0"} BNB</div>
               <div className={"py-1"}>Token: BEP-20 Token Txns</div>
+              <div className={"py-1"}>
+                <Button type={"dashed"}  >API Documentation</Button>
+              </div>
             </Card>
           </Col>
 
         </Row>
         <Row gutter={16}>
           <Col span={24} className={"py-2"}>
-            <Tabs style={{padding:"24px"}} className={"credit-card w-full lg:w-1/2 sm:w-auto shadow-sm mx-auto rounded-xl bg-white"} defaultActiveKey="1" onChange={onChange}>
+            <Tabs style={{padding: "24px"}}
+                  className={"credit-card w-full lg:w-1/2 sm:w-auto shadow-sm mx-auto rounded-xl bg-white"}
+                  defaultActiveKey="1" onChange={onChange}>
               <TabPane tab="Transactions" key="1">
-                <Table dataSource={dataSource} columns={columns} />
+                <Table dataSource={dataSource} columns={columns}/>
               </TabPane>
               <TabPane tab="BEP-20 Token Txns" key="2">
-                <Table dataSource={dataSource} columns={columns} />
+                <Table dataSource={dataSource} columns={columns}/>
               </TabPane>
             </Tabs>
           </Col>

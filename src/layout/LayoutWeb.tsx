@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Container, Navbar} from "react-bootstrap";
+import {Container, Nav, Navbar} from "react-bootstrap";
 import {Button, notification} from "antd";
 import {connectInjectedWallet} from "../wallet";
 import {useDispatch, useSelector} from "react-redux";
@@ -8,6 +8,7 @@ import {useWeb3React} from "@web3-react/core";
 import {Web3Provider} from "@ethersproject/providers";
 import {Outlet} from "react-router-dom";
 import {setWalletData} from "../store/accountWallet";
+import logo from "../assets/images/logo-bnb.png"
 
 const LayoutWeb: React.FunctionComponent = () => {
   const myAccount = useSelector((state: any) => state.wallet);
@@ -41,19 +42,31 @@ const LayoutWeb: React.FunctionComponent = () => {
 
   const distConnect = async () => {
     deactivate();
-    dispatch(setWalletData({isConnected:false}))
+    dispatch(setWalletData({isConnected: false}))
     notification.success({message: "Disconnect success fully"})
   }
   return (
     <div>
-      <Navbar style={{backgroundColor: "#6c757d"}}>
+      <Navbar expand="lg" style={{backgroundColor: "#6c757d"}}>
         <Container>
-          <Navbar.Brand href="#home" style={{fontWeight: "bold", color: "#FFFFFF"}}>REACT-DAPP</Navbar.Brand>
-          <Navbar.Toggle/>
+          <Navbar.Brand href="#home" style={{fontWeight: "bold", color: "#FFFFFF"}}>
+            <div>
+              <img style={{marginBottom: "5px"}} className={"mx-1"} width={"25px"} src={logo} alt=""/>
+              <span>BNB SCAN</span>
+            </div>
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              {/*<Nav.Link href="#home" className={"text-light"}>HOME</Nav.Link>*/}
+              {/*<Nav.Link href="#" className={"text-light"}>TRANSFER ETH</Nav.Link>*/}
+              {/*<Nav.Link href="#link" className={"text-light"}>GET ETH</Nav.Link>*/}
+            </Nav>
+          </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
             {!myAccount.isConnected ? (
               <Navbar.Text>
-                <div className="text-center"><Button onClick={connectInjectedWallet}>Connect now</Button></div>
+                <div><Button onClick={connectInjectedWallet}>Connect now</Button></div>
               </Navbar.Text>
             ) : (
               <Navbar.Text>
