@@ -66,7 +66,7 @@ const LayoutWeb: React.FunctionComponent = () => {
           <Navbar.Collapse className="justify-content-end">
             {!myAccount.isConnected ? (
               <Navbar.Text>
-                <div><Button onClick={connectInjectedWallet}>Connect now</Button></div>
+                {/*<div><Button onClick={connectInjectedWallet}>Connect now</Button></div>*/}
               </Navbar.Text>
             ) : (
               <Navbar.Text>

@@ -7,7 +7,8 @@ import {ethers} from "ethers";
 import {injected} from "../../connect/wallet/connectors";
 import {useSelector} from "react-redux";
 import {Tabs} from 'antd';
-
+import metamaskPng from  "../../assets/images/image.psd.png"
+import {connectInjectedWallet} from "../../wallet";
 const {TabPane} = Tabs;
 
 const HomePage: React.FunctionComponent = () => {
@@ -135,6 +136,14 @@ const HomePage: React.FunctionComponent = () => {
 
   return (
     <div>
+      <Modal  className={"metamask-modal"}  visible={!myAccount.isConnected}  footer={null} >
+        <div>
+          <img src={metamaskPng} alt=""/>
+         <div className={"text-center"}>
+           <Button size={"large"} onClick={connectInjectedWallet}>Connect</Button>
+         </div>
+        </div>
+      </Modal>
       <Modal footer={null} title="SEND_REQUEST" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
             <form className="mt-2" onSubmit={handleSubmit}>
               <div>
@@ -196,7 +205,9 @@ const HomePage: React.FunctionComponent = () => {
               <div className={"py-1"}>Token: BEP-20 Token Txns</div>
               <div className={"d-flex py-1"}>
                 <Button type={"primary"} className={"mx-1"} onClick={()=>{setIsModalVisible(true)}}>TRANSFER ETH</Button>
-                <Button type={"primary"} className={"mx-1"}>GET ETH</Button>
+                <a href="https://testnet.binance.org/faucet-smart">
+                  <Button type={"primary"} className={"mx-1"} target={"_blank"}>GET ETH</Button>
+                </a>
               </div>
             </Card>
           </Col>
