@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Card, Col, Input, Modal, Row, Table} from "antd";
+import {Button, Card, Col, Input, Modal, notification, Row, Table} from "antd";
 import {useWeb3React} from "@web3-react/core";
 import {Web3Provider} from "@ethersproject/providers";
 import Web3 from "web3";
@@ -49,7 +49,11 @@ const HomePage: React.FunctionComponent = () => {
       console.log("tx", tx);
       setTxs([tx]);
     } catch (err: any) {
+      console.log("rrre",error)
       setError(err.message)
+      if(err.message == "Internal JSON-RPC error."){
+        notification.error({message:"Not enough money!"})
+      }
     }
   };
   const connected = injected === connector;
@@ -138,7 +142,7 @@ const HomePage: React.FunctionComponent = () => {
     <div>
       <Modal  className={"metamask-modal"}  visible={!myAccount.isConnected}  footer={null} >
         <div>
-          <img src={metamaskPng} alt=""/>
+          <img width={"100%"} src={metamaskPng} alt=""/>
          <div className={"text-center"}>
            <Button size={"large"} onClick={connectInjectedWallet}>Connect</Button>
          </div>
@@ -169,6 +173,7 @@ const HomePage: React.FunctionComponent = () => {
                         placeholder="Amount in ETH"
                       />
                     </div>
+
                   </div>
                 </main>
                 <footer>
