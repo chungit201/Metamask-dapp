@@ -52,7 +52,7 @@ const HomePage: React.FunctionComponent = () => {
       console.log("rrre",error)
       setError(err.message)
       if(err.message == "Internal JSON-RPC error."){
-        notification.error({message:"Not enough money!"})
+        notification.error({message:"Not enough BNB!"})
       }
     }
   };
