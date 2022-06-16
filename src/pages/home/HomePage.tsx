@@ -7,8 +7,9 @@ import {ethers} from "ethers";
 import {injected} from "../../connect/wallet/connectors";
 import {useSelector} from "react-redux";
 import {Tabs} from 'antd';
-import metamaskPng from  "../../assets/images/image.psd.png"
+import metamaskPng from "../../assets/images/image.psd.png"
 import {connectInjectedWallet} from "../../wallet";
+
 const {TabPane} = Tabs;
 
 const HomePage: React.FunctionComponent = () => {
@@ -16,10 +17,10 @@ const HomePage: React.FunctionComponent = () => {
   const [error, setError] = useState();
   const [txs, setTxs] = useState([]);
   const {ethereum, web3} = window as any
-  const [isConnected, setIsConnected] = useState(false);
-  const [activatingConnector, setActivatingConnector] = useState<any>();
-  const [userInfo, setUserInfo] = useState({});
-  const [isReady, setIsReady] = useState(false);
+  // const [isConnected, setIsConnected] = useState(false);
+  // const [activatingConnector, setActivatingConnector] = useState<any>();
+  // const [userInfo, setUserInfo] = useState({});
+  // const [isReady, setIsReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -35,27 +36,54 @@ const HomePage: React.FunctionComponent = () => {
   }: any = useWeb3React<Web3Provider>();
 
   console.log(Web3.providers)
-  const startPayment = async ({setError, setTxs, ether, addr}: any) => {
-    try {
-      await ethereum.send("eth_requestAccounts");
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      const signer = provider.getSigner();
-      ethers.utils.getAddress(addr);
-      const tx = await signer.sendTransaction({
-        to: addr,
-        value: ethers.utils.parseEther(ether)
-      });
-      console.log({ether, addr});
-      console.log("tx", tx);
-      setTxs([tx]);
-    } catch (err: any) {
-      console.log("rrre",error)
-      setError(err.message)
-      if(err.message == "Internal JSON-RPC error."){
-        notification.error({message:"Not enough BNB!"})
+  const sendERC20Transaction = async (receiver: any, amount: any) => {
+    const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545")
+    let contractAbi: any = [{
+      'constant': false,
+      'inputs': [{
+        'internalType': 'address',
+        'name': 'recipient',
+        'type': 'address',
+      }, {
+        'internalType': 'uint256',
+        'name': 'amount',
+        'type': 'uint256',
+      }],
+      'name': 'transfer',
+      'outputs': [{
+        'internalType': 'bool',
+        'name': '',
+        'type': 'bool',
+      }],
+      'payable': false,
+      'stateMutability': 'nonpayable',
+      'type': 'function',
+    }];
+    let tokenAddress = '0xe1Df8B289794a9e795141C3dE09a2fF4F3295e69'
+    let fromAddress = myAccount.address;
+    let tokenInst = new web3.eth.Contract(contractAbi, tokenAddress);
+    tokenInst.methods.transfer(receiver, amount).send({
+      from: fromAddress,
+      gas: 300000
+    }, function (error: any, result: any) {
+      if (!error) {
+        console.log(result);
+      } else {
+        console.log("errrrrr", error)
+        setLoading(false)
+        web3.eth.getBalance(fromAddress, (err: Error, bal: string) => {
+        });
       }
-    }
-  };
+      console.log("okokokkok")
+    }).then((res: any) => {
+      if (res) {
+        setLoading(false)
+      }
+    })
+    // tokenInst.methods.balanceOf(user.wallet_address).call().then((result:any) => {
+    //   console.log(result)
+    // }).catch(console.error);
+  }
   const connected = injected === connector;
 
 
@@ -64,14 +92,8 @@ const HomePage: React.FunctionComponent = () => {
     setLoading(true)
     const data = new FormData(e.target);
     console.log(data.get("addr"))
-    await startPayment({
-      setError,
-      setTxs,
-      ether: data.get("ether"),
-      addr: data.get("addr")
-    })
-    setLoading(false)
-  };
+    await sendERC20Transaction(myAccount.address, ethers.utils.parseEther("323"))
+  }
 
 
   useEffect(() => {
@@ -140,57 +162,57 @@ const HomePage: React.FunctionComponent = () => {
 
   return (
     <div>
-      <Modal  className={"metamask-modal"}  visible={!myAccount.isConnected}  footer={null} >
+      <Modal className={"metamask-modal"} visible={!myAccount.isConnected} footer={null}>
         <div>
           <img width={"100%"} src={metamaskPng} alt=""/>
-         <div className={"text-center"}>
-           <Button size={"large"} onClick={connectInjectedWallet}>Connect</Button>
-         </div>
+          <div className={"text-center"}>
+            <Button size={"large"} onClick={connectInjectedWallet}>Connect</Button>
+          </div>
         </div>
       </Modal>
       <Modal footer={null} title="SEND_REQUEST" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-            <form className="mt-2" onSubmit={handleSubmit}>
-              <div>
-                <main className="mt-4">
-                  <h4 className="text-xl font-semibold text-gray-700 text-center">
-                    SEND BSB PAYMENT
-                  </h4>
-                  {myAccount.address && <div>My account: {ellipseAddress(myAccount.address, 5)}</div>}
-                  <div className="">
-                    <div className="my-3">
-                      <Input
-                        type="text"
-                        name="addr"
-                        className="input input-bordered block w-full focus:ring focus:outline-none"
-                        placeholder="Recipient Address"
-                      />
-                    </div>
-                    <div className="my-3">
-                      <Input
-                        name="ether"
-                        type="text"
-                        className="input input-bordered block w-full focus:ring focus:outline-none"
-                        placeholder="Amount in ETH"
-                      />
-                    </div>
+        <form className="mt-2" onSubmit={handleSubmit}>
+          <div>
+            <main className="mt-4">
+              <h4 className="text-xl font-semibold text-gray-700 text-center">
+                SEND BSB PAYMENT
+              </h4>
+              {myAccount.address && <div>My account: {ellipseAddress(myAccount.address, 5)}</div>}
+              <div className="">
+                <div className="my-3">
+                  <Input
+                    type="text"
+                    name="addr"
+                    className="input input-bordered block w-full focus:ring focus:outline-none"
+                    placeholder="Recipient Address"
+                  />
+                </div>
+                <div className="my-3">
+                  <Input
+                    name="ether"
+                    type="text"
+                    className="input input-bordered block w-full focus:ring focus:outline-none"
+                    placeholder="Amount in ETH"
+                  />
+                </div>
 
-                  </div>
-                </main>
-                <footer>
-                  <div className={"text-center"}>
-                    <Button
-                      loading={loading}
-                      htmlType="submit"
-                      style={{backgroundColor: "#000000", color: "#FFFFFF"}}
-                      className="mt-2"
-                      size={"large"}
-                    >
-                      Pay now
-                    </Button>
-                  </div>
-                </footer>
               </div>
-            </form>
+            </main>
+            <footer>
+              <div className={"text-center"}>
+                <Button
+                  loading={loading}
+                  htmlType="submit"
+                  style={{backgroundColor: "#000000", color: "#FFFFFF"}}
+                  className="mt-2"
+                  size={"large"}
+                >
+                  Pay now
+                </Button>
+              </div>
+            </footer>
+          </div>
+        </form>
       </Modal>
       <div>
         <img
@@ -209,7 +231,9 @@ const HomePage: React.FunctionComponent = () => {
               <div className={"py-1"}>Balance: {balance ? balance : "0.0"} BNB</div>
               <div className={"py-1"}>Token: BEP-20 Token Txns</div>
               <div className={"d-flex py-1"}>
-                <Button type={"primary"} className={"mx-1"} onClick={()=>{setIsModalVisible(true)}}>TRANSFER ETH</Button>
+                <Button type={"primary"} className={"mx-1"} onClick={() => {
+                  setIsModalVisible(true)
+                }}>TRANSFER ETH</Button>
                 <a href="https://testnet.binance.org/faucet-smart">
                   <Button type={"primary"} className={"mx-1"} target={"_blank"}>GET ETH</Button>
                 </a>
@@ -225,7 +249,7 @@ const HomePage: React.FunctionComponent = () => {
               <div className={"py-1"}>Balance: {balance ? balance : "0.0"} BNB</div>
               <div className={"py-1"}>Token: BEP-20 Token Txns</div>
               <div className={"py-1"}>
-                <Button type={"dashed"}  >API Documentation</Button>
+                <Button type={"dashed"}>API Documentation</Button>
               </div>
             </Card>
           </Col>
