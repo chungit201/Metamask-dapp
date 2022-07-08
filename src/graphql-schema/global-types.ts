@@ -1,0 +1,4 @@
+export enum NUMBER_OF_ROUND {
+	FIRST_ROUND,
+	SECOND_SOUND,
+}

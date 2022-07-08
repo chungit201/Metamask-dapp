@@ -1,0 +1,31 @@
+import { ENV } from './index';
+import { NUMBER_OF_ROUND } from '../graphql-schema/global-types';
+
+// igo contract round 1
+const IGO_CONTRACT_DEV = '0x7f2F5de09710ec0533e7079bADcA0b0a9Fb99573';
+const IGO_CONTRACT_PROD = '0xab228848BcbA8541f3f5792066a583b7b3238Ae9';
+export const IGO_CONTRACT = ENV === 'dev' ? IGO_CONTRACT_DEV : IGO_CONTRACT_PROD;
+
+// chest/ box round 1
+const BOX_DEV_1 = `0x7f2F5de09710ec0533e7079bADcA0b0a9Fb99573`;
+const BOX_PROD_1 = `0xab228848BcbA8541f3f5792066a583b7b3238Ae9`;
+export const BOX_1 = ENV === 'dev' ? BOX_DEV_1 : BOX_PROD_1;
+
+// slime contract round 1
+// const SLIME_CONTRACT_DEV = '0x3e11A9eeBeF8e1877B9679c6ed8A6E2B62effE8c';
+const SLIME_CONTRACT_DEV = '0x62833F47FE1a9ea1537379161fCb82fe93B6B758'; // for breeding
+const SLIME_CONTRACT_PROD = '0xD2a1D5F1e68f6B97387C2e33CCA9284568772d22';
+export const SLIME_CONTRACT = ENV === 'dev' ? SLIME_CONTRACT_DEV : SLIME_CONTRACT_PROD;
+
+// igo contract round 2
+// INO2Pool
+const IGO_CONTRACT_DEV_2 = '0x24DAADF2E4154F534eFfEdD7b476F930035a386c';
+const IGO_CONTRACT_PROD_2 = '0x246EA2A674e25089Cc37a28ee8004e7d0f7462f6';
+export const IGO_CONTRACT_2 = ENV === 'dev' ? IGO_CONTRACT_DEV_2 : IGO_CONTRACT_PROD_2;
+
+//SlimeChest
+const BOX_DEV_2 = `0x6362E8103df686308f1655f1cD3177F02641a66A`;
+const BOX_PROD_2 = `0x7F5F6273FBC593D9cebB2C2369e8cC166CD134eA`;
+export const BOX_2 = ENV === 'dev' ? BOX_DEV_2 : BOX_PROD_2;
+
+export const ROUND = NUMBER_OF_ROUND.SECOND_SOUND;

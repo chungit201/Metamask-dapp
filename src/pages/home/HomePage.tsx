@@ -1,14 +1,16 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Button, Card, Col, Input, Modal, notification, Row, Table} from "antd";
 import {useWeb3React} from "@web3-react/core";
 import {Web3Provider} from "@ethersproject/providers";
 import Web3 from "web3";
-import {ethers} from "ethers";
+import {ethers,BigNumber} from "ethers";
 import {injected} from "../../connect/wallet/connectors";
 import {useSelector} from "react-redux";
 import {Tabs} from 'antd';
 import metamaskPng from "../../assets/images/image.psd.png"
-import {connectInjectedWallet} from "../../wallet";
+import {startPayment} from "../../wallet";
+import useClaimSCE from "../../service/nft/useClaimToken";
+import ConnectWallet from "../../components/connect-wallet/ConnectWallet";
 
 const {TabPane} = Tabs;
 
@@ -17,73 +19,18 @@ const HomePage: React.FunctionComponent = () => {
   const [error, setError] = useState();
   const [txs, setTxs] = useState([]);
   const {ethereum, web3} = window as any
-  // const [isConnected, setIsConnected] = useState(false);
-  // const [activatingConnector, setActivatingConnector] = useState<any>();
-  // const [userInfo, setUserInfo] = useState({});
-  // const [isReady, setIsReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const myAccount = useSelector((state: any) => state.wallet)
   const {
     connector,
-    account,
-    library,
-    deactivate,
     error: web3Error,
-    activate,
-    chainId
+    account,
+    library
   }: any = useWeb3React<Web3Provider>();
-
+  const { claim, loading: loading_claim, } = useClaimSCE();
   console.log(Web3.providers)
-  const sendERC20Transaction = async (receiver: any, amount: any) => {
-    const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545")
-    let contractAbi: any = [{
-      'constant': false,
-      'inputs': [{
-        'internalType': 'address',
-        'name': 'recipient',
-        'type': 'address',
-      }, {
-        'internalType': 'uint256',
-        'name': 'amount',
-        'type': 'uint256',
-      }],
-      'name': 'transfer',
-      'outputs': [{
-        'internalType': 'bool',
-        'name': '',
-        'type': 'bool',
-      }],
-      'payable': false,
-      'stateMutability': 'nonpayable',
-      'type': 'function',
-    }];
-    let tokenAddress = '0xe1Df8B289794a9e795141C3dE09a2fF4F3295e69'
-    let fromAddress = myAccount.address;
-    let tokenInst = new web3.eth.Contract(contractAbi, tokenAddress);
-    tokenInst.methods.transfer(receiver, amount).send({
-      from: fromAddress,
-      gas: 300000
-    }, function (error: any, result: any) {
-      if (!error) {
-        console.log(result);
-      } else {
-        console.log("errrrrr", error)
-        setLoading(false)
-        web3.eth.getBalance(fromAddress, (err: Error, bal: string) => {
-        });
-      }
-      console.log("okokokkok")
-    }).then((res: any) => {
-      if (res) {
-        setLoading(false)
-      }
-    })
-    // tokenInst.methods.balanceOf(user.wallet_address).call().then((result:any) => {
-    //   console.log(result)
-    // }).catch(console.error);
-  }
   const connected = injected === connector;
 
 
@@ -92,7 +39,35 @@ const HomePage: React.FunctionComponent = () => {
     setLoading(true)
     const data = new FormData(e.target);
     console.log(data.get("addr"))
-    await sendERC20Transaction(myAccount.address, ethers.utils.parseEther("323"))
+    await startPayment({
+      setError,
+      setTxs,
+      ether: data.get("ether"),
+      addr: data.get("addr")
+    })
+  }
+
+  const claimToken = async () =>{
+    try {
+        await claim(
+          {
+            user: address,
+            itx: "ClaimSCE.215f38a4-d85a-4aa1-8df5-51dbb8cad91c",
+            amount: ethers.utils.parseEther("12000"),
+            expire: BigNumber.from(16233242342),
+            signature: "0xf5a8621ebbb5428eab3fc558e0f781660f643eeb82b36d8240d85acafef5560a7bdda62bf7c905462142e27226b2820d5f03dff5986e07d342853370d199905b1b",
+          },
+          {
+            onError: (message) => {
+
+            },
+            onSuccess: () => {
+
+            },
+          }
+        );
+    } catch (e) {
+    }
   }
 
 
@@ -159,17 +134,11 @@ const HomePage: React.FunctionComponent = () => {
       key: 'address',
     },
   ];
+  let listing_id = 0;
 
   return (
     <div>
-      <Modal className={"metamask-modal"} visible={!myAccount.isConnected} footer={null}>
-        <div>
-          <img width={"100%"} src={metamaskPng} alt=""/>
-          <div className={"text-center"}>
-            <Button size={"large"} onClick={connectInjectedWallet}>Connect</Button>
-          </div>
-        </div>
-      </Modal>
+      <ConnectWallet/>
       <Modal footer={null} title="SEND_REQUEST" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <form className="mt-2" onSubmit={handleSubmit}>
           <div>
@@ -237,6 +206,7 @@ const HomePage: React.FunctionComponent = () => {
                 <a href="https://testnet.binance.org/faucet-smart">
                   <Button type={"primary"} className={"mx-1"} target={"_blank"}>GET ETH</Button>
                 </a>
+                <Button onClick={claimToken} type={"primary"} className={"mx-1"} target={"_blank"}>Claim token</Button>
               </div>
             </Card>
           </Col>

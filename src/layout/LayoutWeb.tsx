@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Container, Nav, Navbar} from "react-bootstrap";
 import {Button, notification} from "antd";
-import {connectInjectedWallet} from "../wallet";
 import {useDispatch, useSelector} from "react-redux";
 import {ethers} from "ethers";
 import {useWeb3React} from "@web3-react/core";
